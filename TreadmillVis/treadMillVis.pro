@@ -1,0 +1,23 @@
+QT       += opengl
+
+SOURCES += \
+    main.cpp \
+    window.cpp \
+    glwidget.cpp \
+    imgwidget.cpp \
+    mesh.cpp
+
+#mac hack
+#LIBS += -lglut # \
+#        -lGLU
+
+HEADERS += \
+    window.h \
+    glwidget.h \
+    imgwidget.h \
+    camera.h \
+    mesh.h
+
+INCLUDEPATH += ../shared
+
+mac: LIBS += -framework GLUT
