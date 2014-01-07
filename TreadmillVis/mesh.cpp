@@ -121,10 +121,9 @@ int Mesh::drawMesh() {
             qDebug()<<"m---";
             */
             qreal d1,d2,d3,d4;
-            index = 0;
             if (index == 0) {
 
-                glColor4f(0.8,0.8,0.8,1);
+                glColor4f(0.0,0.8,0.8,1);
                 d1 = 100.0;
                 d2 = d1;
                 d3 = d1;
@@ -135,14 +134,14 @@ int Mesh::drawMesh() {
                 //qDebug()<<"i"<<i;
                 //qDebug()<<" j"<<j;
                 //if (index != 6 && index !=5 && index != 4) continue;
-                if (index > 58) continue;
+                if (index > 18) continue;
 
                 qreal scale = -1.0;
                 qreal n1 = normals->at(index).x();
                 qreal n2 = normals->at(index).y();
                 qreal n3 = normals->at(index).z();
 
-                QVector3D n = QVector3D(n1,n3,n2);
+                QVector3D n = QVector3D(n1,-n3,n2);
 
                 d1 = scale * distances->at(index) / ( QVector3D::dotProduct(c1, n));
                 if (false) {
@@ -192,10 +191,15 @@ int Mesh::drawMesh() {
 
             glBegin(GL_POLYGON);
 
-            float imWidth = 418;
-            float imHeight = 208;
-            float si = ((float) xCells - i) / xCells;
-            float sii = ((float) xCells - i+1) / xCells;
+            //float imWidth = 418;
+            //float imHeight = 208;
+            float offset = 0.;
+            //float si =  (offset + 1.0f - ((float)i ) / xCells);
+            float si =  (offset + ((float)i ) / xCells);
+            if (si>1.0) si -= 1.0;
+            //float sii =  (offset + 1.0f - ((float)i+1 ) / xCells);
+            float sii =  (offset + ((float)i-1 ) / xCells);
+            if (sii>1.0) sii -= 1.0;
             float sj = ((float) yCells - j) / yCells;
             float sjj = ((float) yCells - j-1) / yCells;
 

@@ -78,7 +78,7 @@ void GLWidget::paintGL()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glClear (GL_DEPTH_BUFFER_BIT);
-    gluLookAt(1 + qCos(theta),20*qSin(theta*2),0,
+    gluLookAt(1 + qCos(theta),1,20*qSin(theta*2),
               -3.0,0.0,0.0,
               0.0,1.0,0.0);
 
@@ -95,7 +95,7 @@ void GLWidget::paintGL()
     glMatrixMode(GL_MODELVIEW);
     glClear (GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-    float camHeight = 5.0;
+    float camHeight = 0.0;
     gluLookAt(0.0,camHeight,0.0,
               qCos(theta),camHeight,qSin(theta),
               0.0,1.0,0.0);
