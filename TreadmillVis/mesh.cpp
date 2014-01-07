@@ -78,8 +78,8 @@ QVector3D Mesh::unitVectorFromPx(int x, int y, int w, int h)
    // projection: x=0 is 0 degrees longitude, x=w is 360 degrees longitude
    //             y=0 is 180 lat, y= h is -180 lat
 
-    qreal alpha = 3.14159265359 * (qreal) (h - 1 - y) / (qreal) h;
-    qreal beta = 2 * 3.14159265359 * (qreal) (w - 1 - x) / (qreal) w;
+    qreal alpha = 3.14159265359 * (qreal) (y) / (qreal) h;
+    qreal beta = 2 * 3.14159265359 * (qreal) (x) / (qreal) w -  3.14159265359 * 0.5;
 
     qreal vy = qCos( alpha);
     qreal yScale = qSin(alpha);
@@ -121,25 +121,23 @@ int Mesh::drawMesh() {
             qDebug()<<"m---";
             */
             qreal d1,d2,d3,d4;
+            index = 0;
+            if (index == 0) {
 
-            if (index ==0) {
-
-                continue;
-            glColor4f(0.8,0.8,0.8,1);
+                glColor4f(0.8,0.8,0.8,1);
                 d1 = 100.0;
                 d2 = d1;
                 d3 = d1;
                 d4 = d1;
             } else {
-
                 glColor4f(1,1,1,1);
                 //index = 5;
                 //qDebug()<<"i"<<i;
                 //qDebug()<<" j"<<j;
                 //if (index != 6 && index !=5 && index != 4) continue;
-                if (index != 1) continue;
+                if (index > 58) continue;
 
-                qreal scale = 1.0;
+                qreal scale = -1.0;
                 qreal n1 = normals->at(index).x();
                 qreal n2 = normals->at(index).y();
                 qreal n3 = normals->at(index).z();
@@ -147,6 +145,13 @@ int Mesh::drawMesh() {
                 QVector3D n = QVector3D(n1,n3,n2);
 
                 d1 = scale * distances->at(index) / ( QVector3D::dotProduct(c1, n));
+                if (false) {
+                    qDebug()<<"distance "<<d1;
+                qDebug()<<"c1 "<<c1;
+                qDebug()<<"n "<<n;
+                qDebug()<<"dot "<<QVector3D::dotProduct(c1,n);
+                qDebug()<<"---";
+                }
                 d2 = scale * distances->at(index) / ( QVector3D::dotProduct(c2, n));
                 d3 = scale * distances->at(index) / ( QVector3D::dotProduct(c3, n));
                 d4 = scale * distances->at(index) / ( QVector3D::dotProduct(c4, n));
@@ -157,7 +162,6 @@ int Mesh::drawMesh() {
                 qreal d4 = scale * - distances->at(index) / ( QVector3D::dotProduct(c4, normals->at(index) ));
                 */
 
-                if (d1 < 0) continue;
 
                 if (false){
 
@@ -188,12 +192,12 @@ int Mesh::drawMesh() {
 
             glBegin(GL_POLYGON);
 
-            float imWidth = 512;
+            float imWidth = 418;
             float imHeight = 208;
-            float si = ((float) i) / imWidth;
-            float sii = ((float) i+1) / imWidth;
-            float sj = ((float) j) / imHeight;
-            float sjj = ((float) j+1) / imHeight;
+            float si = ((float) xCells - i) / xCells;
+            float sii = ((float) xCells - i+1) / xCells;
+            float sj = ((float) yCells - j) / yCells;
+            float sjj = ((float) yCells - j-1) / yCells;
 
             float l1 = c1.length();
             glTexCoord4f(l1*sii,l1*sj,0,l1);

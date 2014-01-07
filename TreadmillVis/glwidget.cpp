@@ -95,8 +95,9 @@ void GLWidget::paintGL()
     glMatrixMode(GL_MODELVIEW);
     glClear (GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-    gluLookAt(0.0,0.0,0.0,
-              qCos(theta),0.0,qSin(theta),
+    float camHeight = 5.0;
+    gluLookAt(0.0,camHeight,0.0,
+              qCos(theta),camHeight,qSin(theta),
               0.0,1.0,0.0);
     renderScene();
 
@@ -125,10 +126,10 @@ void GLWidget::renderScene()
 
     glBegin(GL_POLYGON);
 
-     glVertex3f(12,-1,0);
-     glVertex3f(12,1,0);
-     glVertex3f(14,1,0);
-     glVertex3f(14,-1,0);
+     glVertex3f(10,0,-1);
+     glVertex3f(10,0,1);
+     glVertex3f(14,0,1);
+     glVertex3f(14,0,-1);
     glEnd();
 
 /*
