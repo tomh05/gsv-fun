@@ -54,6 +54,7 @@ void GLWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(250,250,250,0);
 
+    /*
     // Left: Plan View
     glViewport(0,0,400,600);
 
@@ -68,7 +69,7 @@ void GLWidget::paintGL()
               0.0,0.0,0.0,
               -1.0,0.0,0.0);
     renderScene();
-
+*/
     // Top right: Camera view
     glViewport(400,300,400,300);
     glMatrixMode(GL_PROJECTION);
@@ -78,7 +79,7 @@ void GLWidget::paintGL()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glClear (GL_DEPTH_BUFFER_BIT);
-    gluLookAt(1 + qCos(theta),1,20*qSin(theta*2),
+    gluLookAt(1 + qCos(theta),1,20*qSin(theta*.2),
               -3.0,0.0,0.0,
               0.0,1.0,0.0);
 
@@ -99,7 +100,7 @@ void GLWidget::paintGL()
     gluLookAt(0.0,camHeight,0.0,
               qCos(theta),camHeight,qSin(theta),
               0.0,1.0,0.0);
-    renderScene();
+    //renderScene();
 
     theta += 0.2;
 

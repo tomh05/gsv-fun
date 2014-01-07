@@ -20,6 +20,7 @@ class Mesh : public QGLWidget
 public:
     explicit Mesh(QWidget *parent = 0);
     int readDepthFiles();
+    int buildMesh();
     int drawMesh();
 signals:
 
@@ -36,6 +37,8 @@ private:
     QVector3D unitVectorFromPx(int x, int y, int w, int h);
     GLuint texID;
     QImage* panImg;
+    QList<QVector3D>* meshVertices;
+    QList<QVector3D>* meshTexCoords;
 
 };
 

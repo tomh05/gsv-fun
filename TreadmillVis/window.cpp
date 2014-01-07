@@ -11,6 +11,7 @@ Window::Window(QWidget *parent) :
     mesh = new Mesh(this);
 
     mesh->readDepthFiles();
+    mesh->buildMesh();
 
 
     openGL = new GLWidget(mesh,this);
