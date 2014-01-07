@@ -54,7 +54,8 @@ def GetPanoramaTile(panoid, zoom, x, y):
     url += '&renderer=spherical'		# standard speherical projection
     url += '&v=4'				# version
     url = url % (BaseUri, panoid, zoom, x, y)
-
+    print "url is"
+    print url
     return GetUrlContents(url)
 
 def GetUrlContents(url):

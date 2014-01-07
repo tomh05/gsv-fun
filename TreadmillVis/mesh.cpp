@@ -56,7 +56,7 @@ int Mesh::readDepthFiles()
    qDebug()<<a.at(1);
 
    QJsonArray::iterator j;
-   for (j = a.begin(); j != a.end(); ++j) {
+   for (j = a.begin(); j != a.end(); j++) {
        distances->append( (*j).toObject().value("d").toDouble() );
        //distances->append(1.0);
 
@@ -95,14 +95,8 @@ int Mesh::drawMesh() {
     int xCells = 512;
     int yCells = 256;
 
-    for (int j = 0;j<yCells;j++){
+    for (int j = 0;j<yCells-20;j++){
         for (int i = 0;i<xCells;i++) {
-
-            int index = indices->at(i+j*yCells);
-            //if (index ==0) continue;
-
-            //qDebug()<<"i"<<i;
-            //qDebug()<<" j"<<j;
 
             // compute corners
             // top left, bottom left, bottom right, top right
@@ -110,48 +104,82 @@ int Mesh::drawMesh() {
             QVector3D c2 = unitVectorFromPx( i   , (j+1), xCells , yCells );
             QVector3D c3 = unitVectorFromPx( (i+1), (j+1), xCells , yCells );
             QVector3D c4 = unitVectorFromPx( (i+1), j, xCells , yCells );
-
-
-            qreal scale = -1.0;
-            qreal n1 = normals->at(index).x();
-            qreal n2 = normals->at(index).y();
-            qreal n3 = normals->at(index).z();
-
-            QVector3D n = QVector3D(n1,n3,n2);
-
-            qreal d1 = scale * - distances->at(index) / ( QVector3D::dotProduct(c1, n));
-            qreal d2 = scale * - distances->at(index) / ( QVector3D::dotProduct(c2, n));
-            qreal d3 = scale * - distances->at(index) / ( QVector3D::dotProduct(c3, n));
-            qreal d4 = scale * - distances->at(index) / ( QVector3D::dotProduct(c4, n));
             /*
-            qreal d1 = scale * - distances->at(index) / ( QVector3D::dotProduct(c1, normals->at(index) ));
-            qreal d2 = scale * - distances->at(index) / ( QVector3D::dotProduct(c2, normals->at(index) ));
-            qreal d3 = scale * - distances->at(index) / ( QVector3D::dotProduct(c3, normals->at(index) ));
-            qreal d4 = scale * - distances->at(index) / ( QVector3D::dotProduct(c4, normals->at(index) ));
+            qDebug()<<"i"<<i;
+            qDebug()<<"j"<<j;
+            qDebug()<<"l"<<indices->length();
+            qDebug()<<"a---";
             */
+            int index = indices->at(i+j*xCells);
+            if (index>70) index=0;
+            /*qDebug()<<"index"<<index;
+            qDebug()<<"nl"<<normals->length();
+            qDebug()<<"dl"<<distances->at(0);
+            qDebug()<<"dl"<<distances->at(1);
+            qDebug()<<"dl"<<distances->at(69);
+            qDebug()<<"dl"<<distances->at(70);
+            qDebug()<<"m---";
+            */
+            qreal d1,d2,d3,d4;
 
-            //if (d1 < 0) continue;
+            if (index ==0) {
 
-            if (false){
+                continue;
+            glColor4f(0.8,0.8,0.8,1);
+                d1 = 100.0;
+                d2 = d1;
+                d3 = d1;
+                d4 = d1;
+            } else {
 
-            qDebug()<<"dist"<<distances->at(index);
-            qDebug()<<"c1"<<c1;
-            qDebug()<<"n"<<normals->at(index);
-            qDebug()<<"dot"<< QVector3D::dotProduct(c1, normals->at(index));
-            qDebug()<<"d1"<<d1;
-           }
+                glColor4f(1,1,1,1);
+                //index = 5;
+                //qDebug()<<"i"<<i;
+                //qDebug()<<" j"<<j;
+                //if (index != 6 && index !=5 && index != 4) continue;
+                if (index != 1) continue;
 
-            d1 = 10.0;
-            d2 = 10.0;
-            d3 = 10.0;
-            d4 = 10.0;
+                qreal scale = 1.0;
+                qreal n1 = normals->at(index).x();
+                qreal n2 = normals->at(index).y();
+                qreal n3 = normals->at(index).z();
 
+                QVector3D n = QVector3D(n1,n3,n2);
+
+                d1 = scale * distances->at(index) / ( QVector3D::dotProduct(c1, n));
+                d2 = scale * distances->at(index) / ( QVector3D::dotProduct(c2, n));
+                d3 = scale * distances->at(index) / ( QVector3D::dotProduct(c3, n));
+                d4 = scale * distances->at(index) / ( QVector3D::dotProduct(c4, n));
+                /*
+                qreal d1 = scale * - distances->at(index) / ( QVector3D::dotProduct(c1, normals->at(index) ));
+                qreal d2 = scale * - distances->at(index) / ( QVector3D::dotProduct(c2, normals->at(index) ));
+                qreal d3 = scale * - distances->at(index) / ( QVector3D::dotProduct(c3, normals->at(index) ));
+                qreal d4 = scale * - distances->at(index) / ( QVector3D::dotProduct(c4, normals->at(index) ));
+                */
+
+                if (d1 < 0) continue;
+
+                if (false){
+
+                    qDebug()<<"dist"<<distances->at(index);
+                    qDebug()<<"c1"<<c1;
+                    qDebug()<<"n"<<normals->at(index);
+                    qDebug()<<"dot"<< QVector3D::dotProduct(c1, normals->at(index));
+                    qDebug()<<"d1"<<d1;
+                }
+                /*
+            d1 = 10.0+ 0.1 * i;
+            d2 = d1+1;
+            d3 = d1+2;
+            d4 = d1+1;
+*/
+
+            }
             c1 = d1 * c1;
             c2 = d2 * c2;
             c3 = d3 * c3;
             c4 = d4 * c4;
 
-            glColor4f(1,1,1,1);
             glEnable(GL_TEXTURE_2D);
             texID = bindTexture(*panImg);
 
@@ -160,20 +188,27 @@ int Mesh::drawMesh() {
 
             glBegin(GL_POLYGON);
 
+            float imWidth = 512;
+            float imHeight = 208;
+            float si = ((float) i) / imWidth;
+            float sii = ((float) i+1) / imWidth;
+            float sj = ((float) j) / imHeight;
+            float sjj = ((float) j+1) / imHeight;
+
             float l1 = c1.length();
-            glTexCoord4f(l1,0,0,l1);
+            glTexCoord4f(l1*sii,l1*sj,0,l1);
             glVertex3f(c1.x(),c1.y(),c1.z());
 
             float l2 = c2.length();
-            glTexCoord4f(l2,l2,0,l2);
+            glTexCoord4f(l2*sii,l2*sjj,0,l2);
             glVertex3f(c2.x(),c2.y(),c2.z());
 
             float l3 = c3.length();
-            glTexCoord4f(0,l3,0,l3);
+            glTexCoord4f(l3*si,l3*sjj,0,l3);
             glVertex3f(c3.x(),c3.y(),c3.z());
 
             float l4 = c4.length();
-            glTexCoord4f(0,0,0,l4);
+            glTexCoord4f(l4*si,l4*sj,0,l4);
             glVertex3f(c4.x(),c4.y(),c4.z());
 
 

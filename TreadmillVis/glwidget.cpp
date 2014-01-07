@@ -73,20 +73,25 @@ void GLWidget::paintGL()
     glViewport(400,300,400,300);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(400,1.5,0.1, 1000);
+    //gluPerspective(400,1.5,0.1, 1000);
+    gluPerspective(80,1.5,0.1, 1000);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glClear (GL_DEPTH_BUFFER_BIT);
-    gluLookAt(100*qCos(theta),100,100.0*qSin(theta),
-              0.0,0.0,0.0,
+    gluLookAt(1 + qCos(theta),20*qSin(theta*2),0,
+              -3.0,0.0,0.0,
               0.0,1.0,0.0);
+
+    //gluLookAt(100*qCos(theta),100,100.0*qSin(theta),
+    //          0.0,0.0,0.0,
+    //          0.0,1.0,0.0);
     renderScene();
 
     // Bottom right: Moveable view
     glViewport(400,0,400,300);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(10,1.5,0.1, 1000);
+    gluPerspective(80,1.5,0.1, 1000);
     glMatrixMode(GL_MODELVIEW);
     glClear (GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
@@ -117,6 +122,15 @@ void GLWidget::renderScene()
     }
 
     glEnd();
+
+    glBegin(GL_POLYGON);
+
+     glVertex3f(12,-1,0);
+     glVertex3f(12,1,0);
+     glVertex3f(14,1,0);
+     glVertex3f(14,-1,0);
+    glEnd();
+
 /*
 
     return;
