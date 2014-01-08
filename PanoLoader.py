@@ -3,6 +3,8 @@
 
 import StreetView as sv
 import simplejson
+from PIL import Image
+from StringIO import StringIO
 
 
 print "loading pano"
@@ -16,12 +18,24 @@ if pano is None:
    print "empty panorama"
    exit()
 
-tile = sv.GetPanoramaTile(pano.PanoId,0, 0, 0);
+panImg = Image.new("RGB", (1668,832), "white")
+
+for i in range(0,4):
+    for j in range(0,2):
+        tileData = sv.GetPanoramaTile(pano.PanoId,2, i, j)
+        tileBuffer = StringIO()
+        tileBuffer.write(tileData)
+        tileBuffer.seek(0)
+        #tileImg = Image.new("RGB", (512,512), None)
+        #tileImg = Image.frombuffer("RGB",(512,512),jpg,"raw"
+        #tileImg = Image.fromstring('RGB',(512,512),tileData,"jpeg",0,0)
+        tileImg = Image.open(tileBuffer)
+        panImg.paste(tileImg, (512*i,512*j))
 
 output = open("pan40.jpg","wb")
-
-output.write(tile)
-output.close()
+panImg.save("pan1.jpg")
+#output.write(tile)
+#output.close()
 
 
 # depth map is 512x256 image, and a bunch of plane normals and distances to origin

@@ -6,9 +6,11 @@ Mesh::Mesh(QWidget *parent) :
     indices = new QList<int>();
     normals = new QList<QVector3D>();
     distances = new QList<double>();
-
-    //panImg = new QImage("/Users/tom/Programming/BBC/Treadmill/pan1.jpg");
+#ifdef __linux__
     panImg = new QImage("/home/tomh/Projects/treadmill/gsv-fun/pan1.jpg");
+#else
+    panImg = new QImage("/Users/tom/Programming/BBC/Treadmill/pan1.jpg");
+#endif
 }
 
 int Mesh::readDepthFiles()
@@ -16,8 +18,11 @@ int Mesh::readDepthFiles()
     // indices file
     QFile iFile;
     QString iContents;
-    //iFile.setFileName("/Users/tom/Programming/BBC/Treadmill/indices.json");
+#ifdef __linux__
     iFile.setFileName("/home/tomh/Projects/treadmill/gsv-fun/indices.json");
+#else
+    iFile.setFileName("/Users/tom/Programming/BBC/Treadmill/indices.json");
+#endif
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
     iContents = iFile.readAll();
     iFile.close();
@@ -39,8 +44,11 @@ int Mesh::readDepthFiles()
     // planes file
     QFile pFile;
     QString pContents;
-    //pFile.setFileName("/Users/tom/Programming/BBC/Treadmill/planes.json");
+#ifdef __linux__
     pFile.setFileName("/home/tomh/Projects/treadmill/gsv-fun/planes.json");
+#else
+    pFile.setFileName("/Users/tom/Programming/BBC/Treadmill/planes.json");
+#endif
     pFile.open(QIODevice::ReadOnly | QIODevice::Text);
     pContents = pFile.readAll();
     pFile.close();

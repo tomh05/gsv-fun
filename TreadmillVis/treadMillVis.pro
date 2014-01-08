@@ -10,7 +10,7 @@ SOURCES += \
     mesh.cpp
 
 #mac hack
-unix {
+unix:!macx {
 LIBS += -lglut  \
         -lGLU
 }
@@ -24,4 +24,4 @@ HEADERS += \
 
 INCLUDEPATH += ../shared
 
-mac: LIBS += -framework GLUT
+macx: LIBS += -framework GLUT
