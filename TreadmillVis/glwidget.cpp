@@ -71,7 +71,8 @@ void GLWidget::paintGL()
     renderScene();
 */
     // Top right: Camera view
-    glViewport(400,300,400,300);
+    //glViewport(400,300,400,300);
+    glViewport(0,0,800,600);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     //gluPerspective(400,1.5,0.1, 1000);
@@ -114,7 +115,7 @@ void GLWidget::renderScene()
 
      glColor3f(0,0.5,0);
     glBegin(GL_LINES);
-    for (int i = -10; i <= 10; i++) {
+    for (int i = -10; i <= 10; i+=2) {
       //  for (int j = -10; j <= 10, j++) {
             glVertex3f(-10,0,i);
             glVertex3f(10,0,i);

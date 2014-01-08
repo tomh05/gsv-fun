@@ -198,7 +198,6 @@ int Mesh::drawMesh()
     texID = bindTexture(*panImg);
                 glColor4f(1,1,1,1);
 
-        qDebug()<<"mesh";
 
         glBegin(GL_QUADS);
     for (int i=0; i<meshVertices->length();i++)
