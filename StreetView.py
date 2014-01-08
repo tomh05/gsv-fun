@@ -54,8 +54,6 @@ def GetPanoramaTile(panoid, zoom, x, y):
     url += '&renderer=spherical'		# standard speherical projection
     url += '&v=4'				# version
     url = url % (BaseUri, panoid, zoom, x, y)
-    print "url is"
-    print url
     return GetUrlContents(url)
 
 def GetUrlContents(url):
@@ -69,7 +67,6 @@ class PanoramaMetadata:
     def __init__(self, panodoc):
         self.PanoDoc = panodoc
         panoDocCtx = self.PanoDoc.xpathNewContext()
-        print self.PanoDoc
         self.PanoId = self.getXmlVal(panoDocCtx,"/panorama/data_properties/@pano_id")
 
         self.ImageWidth = self.getXmlVal(panoDocCtx,"/panorama/data_properties/@image_width")
@@ -155,9 +152,6 @@ class PanoramaMetadata:
             return
         pos += headerSize
 
-        print "wid"
-        print panoWidth
-        print panoHeight
         self.DepthMapIndices = [ord(x) for x in raw[planeIndicesOffset:planeIndicesOffset + (panoWidth * panoHeight)]]
         pos += len(self.DepthMapIndices)
 

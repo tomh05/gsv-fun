@@ -5,7 +5,7 @@
 #include <QList>
 #include <QDebug>
 #include <QTextStream>
-#include <QRegularExpression>
+//#include <QRegularExpression>
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/qmath.h>
 

@@ -7,7 +7,8 @@ Mesh::Mesh(QWidget *parent) :
     normals = new QList<QVector3D>();
     distances = new QList<double>();
 
-    panImg = new QImage("/Users/tom/Programming/BBC/Treadmill/pan1.jpg");
+    //panImg = new QImage("/Users/tom/Programming/BBC/Treadmill/pan1.jpg");
+    panImg = new QImage("/home/tomh/Projects/treadmill/gsv-fun/pan1.jpg");
 }
 
 int Mesh::readDepthFiles()
@@ -15,13 +16,13 @@ int Mesh::readDepthFiles()
     // indices file
     QFile iFile;
     QString iContents;
-    iFile.setFileName("/Users/tom/Programming/BBC/Treadmill/indices.json");
+    //iFile.setFileName("/Users/tom/Programming/BBC/Treadmill/indices.json");
+    iFile.setFileName("/home/tomh/Projects/treadmill/gsv-fun/indices.json");
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
     iContents = iFile.readAll();
     iFile.close();
 
     QJsonDocument iD = QJsonDocument::fromJson(iContents.toUtf8());
-
     if (!iD.isArray()) {
         qDebug()<<"error: expected array in index file";
         return -1;
@@ -38,7 +39,8 @@ int Mesh::readDepthFiles()
     // planes file
     QFile pFile;
     QString pContents;
-    pFile.setFileName("/Users/tom/Programming/BBC/Treadmill/planes.json");
+    //pFile.setFileName("/Users/tom/Programming/BBC/Treadmill/planes.json");
+    pFile.setFileName("/home/tomh/Projects/treadmill/gsv-fun/planes.json");
     pFile.open(QIODevice::ReadOnly | QIODevice::Text);
     pContents = pFile.readAll();
     pFile.close();

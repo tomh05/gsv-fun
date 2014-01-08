@@ -1,4 +1,6 @@
-QT       += opengl
+#QT       += core opengl
+QT += widgets
+QT += opengl
 
 SOURCES += \
     main.cpp \
@@ -8,7 +10,7 @@ SOURCES += \
     mesh.cpp
 
 #mac hack
-#LIBS += -lglut # \
+#LIBS += -lglut  \
 #        -lGLU
 
 HEADERS += \

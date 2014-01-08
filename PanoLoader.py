@@ -8,10 +8,10 @@ import simplejson
 print "loading pano"
 #pano = sv.GetPanoramaMetadata(None,54.977275,1.614743,20000)
 #pano = sv.GetPanoramaMetadata(lat=27.683528, lon=-99.580078)
-#pano = sv.GetPanoramaMetadata(lat=54.977275, lon=-1.614743) # NCL Grey Street
+pano = sv.GetPanoramaMetadata(lat=54.977275, lon=-1.614743) # NCL Grey Street
 
 #pano = sv.GetPanoramaMetadata(lat=55.001227, lon=-1.631196, radius = 50) #elgy
-pano = sv.GetPanoramaMetadata(lat=42.345601, lon = -71.098348, radius = 50) #USA
+#pano = sv.GetPanoramaMetadata(lat=42.345601, lon = -71.098348, radius = 50) #USA
 if pano is None:
    print "empty panorama"
    exit()
