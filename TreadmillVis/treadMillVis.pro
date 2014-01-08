@@ -10,8 +10,10 @@ SOURCES += \
     mesh.cpp
 
 #mac hack
-#LIBS += -lglut  \
-#        -lGLU
+unix {
+LIBS += -lglut  \
+        -lGLU
+}
 
 HEADERS += \
     window.h \
