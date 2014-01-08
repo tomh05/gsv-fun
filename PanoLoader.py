@@ -16,7 +16,7 @@ if pano is None:
    print "empty panorama"
    exit()
 
-tile = sv.GetPanoramaTile(pano.PanoId,2, 4, 0);
+tile = sv.GetPanoramaTile(pano.PanoId,0, 0, 0);
 
 output = open("pan40.jpg","wb")
 
