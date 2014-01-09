@@ -52,7 +52,7 @@ void GLWidget::paintGL()
     //helper->paint(&painter, event, elapsed);
     //painter.end();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(250,250,250,0);
+    glClearColor(0.5,0.5,0.5,0.0);
 
     /*
     // Left: Plan View
@@ -113,6 +113,8 @@ void GLWidget::renderScene()
 {
     mesh->drawMesh();
 
+
+    /*
      glColor3f(0,0.5,0);
     glBegin(GL_LINES);
     for (int i = -10; i <= 10; i+=2) {
@@ -133,34 +135,6 @@ void GLWidget::renderScene()
      glVertex3f(14,0,1);
      glVertex3f(14,0,-1);
     glEnd();
-
-/*
-
-    return;
-
-    //draw pitch
-    glColor3f(0,0.5,0);
-    glBegin(GL_POLYGON);
-    float halfLength = 50;
-    float halfWidth = 35;
-    glVertex3f(-halfLength,0,-halfWidth);
-    glVertex3f(-halfLength,0,halfWidth);
-    glVertex3f(halfLength,0,halfWidth);
-    glVertex3f(halfLength,0,-halfWidth);
-    glEnd();
-    //draw a shape
-    glPushMatrix();
-    glTranslatef(10,10,10);
-    //glRotatef(90,1,0,0);
-    glScalef(10,10,10);
-    glColor3f(1,0,0);
-    glBegin(GL_POLYGON);
-    glVertex3f(-1,0,-1);
-    glVertex3f(-1,0,1);
-    glVertex3f(1,0,1);
-    glVertex3f(1,0,-1);
-    glEnd();
-    glPopMatrix();
     */
 
 

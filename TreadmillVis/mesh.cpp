@@ -86,8 +86,8 @@ QVector3D Mesh::unitVectorFromPx(int x, int y, int w, int h)
     // projection: x=0 is 0 degrees longitude, x=w is 360 degrees longitude
     //             y=0 is 180 lat, y= h is -180 lat
 
-    qreal alpha = 3.14159265359 * (qreal) (y) / (qreal) h;
-    qreal beta = 2 * 3.14159265359 * (qreal) (x) / (qreal) w -  3.14159265359 * 0.5;
+    qreal alpha = Pi * (qreal) (y) / (qreal) h;
+    qreal beta = 2 * Pi* (qreal) (x) / (qreal) w -  Pi * 0.5;
 
     qreal vy = qCos( alpha);
     qreal yScale = qSin(alpha);
@@ -130,6 +130,7 @@ int Mesh::buildMesh() {
                 d3 = d1;
                 d4 = d1;
 
+
                 // For regions with a plane:
             } else {
                 //index = 5;
@@ -153,6 +154,8 @@ int Mesh::buildMesh() {
                 d3 = scale * distances->at(index) / ( QVector3D::dotProduct(c3, n));
                 d4 = scale * distances->at(index) / ( QVector3D::dotProduct(c4, n));
 
+                if (d1<0 || d2<0 || d3<0 || d4<0) continue;
+
                 /*
                  if (d1 < 0) {
                     qDebug()<<"skipping index "<<index;
@@ -172,20 +175,20 @@ int Mesh::buildMesh() {
             c4 = d4 * c4;
 
             // Compute texture coordinates
-            float offset = 0.;
-            //float si =  (offset + 1.0f - ((float)i ) / xCells);
-            float si =  (offset + ((float)i ) / xCells);
+            qreal offset = 0.;
+            //qreal si =  (offset + 1.0f - ((qreal)i ) / xCells);
+            qreal si =  (offset + ((qreal)i ) / (qreal)xCells);
             if (si>1.0) si -= 1.0;
-            //float sii =  (offset + 1.0f - ((float)i+1 ) / xCells);
-            float sii =  (offset + ((float)i-1 ) / xCells);
+            //qreal sii =  (offset + 1.0f - ((qreal)i+1 ) / xCells);
+            qreal sii =  (offset + ((qreal)i-1 ) / (qreal)xCells);
             if (sii>1.0) sii -= 1.0;
-            float sj = ((float) yCells - j) / yCells;
-            float sjj = ((float) yCells - j-1) / yCells;
+            qreal sj = ((qreal) yCells - j) / (qreal)yCells;
+            qreal sjj = ((qreal) yCells - j-1) / (qreal)yCells;
 
-            float l1 = c1.length();
-            float l2 = c2.length();
-            float l3 = c3.length();
-            float l4 = c4.length();
+            qreal l1 = c1.length();
+            qreal l2 = c2.length();
+            qreal l3 = c3.length();
+            qreal l4 = c4.length();
 
             meshVertices->append(QVector3D(c1));
             meshVertices->append(QVector3D(c2));
@@ -196,6 +199,7 @@ int Mesh::buildMesh() {
             meshTexCoords->append(QVector3D(l2*sii,l2*sjj,l2));
             meshTexCoords->append(QVector3D(l3*si,l3*sjj,l3));
             meshTexCoords->append(QVector3D(l4*si,l4*sj,l4));
+
         }
     }
     return 0;

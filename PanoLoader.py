@@ -5,24 +5,35 @@ import StreetView as sv
 import simplejson
 from PIL import Image
 from StringIO import StringIO
-
+import random
 
 print "loading pano"
 #pano = sv.GetPanoramaMetadata(None,54.977275,1.614743,20000)
 #pano = sv.GetPanoramaMetadata(lat=27.683528, lon=-99.580078)
-pano = sv.GetPanoramaMetadata(lat=54.977275, lon=-1.614743) # NCL Grey Street
+#pano = sv.GetPanoramaMetadata(lat=54.977275, lon=-1.614743) # NCL Grey Street
+pano = sv.GetPanoramaMetadata(lat=(random.uniform(-90,90)), lon=(random.uniform(-180,180)))
+while pano is None:
+    ranLat = random.uniform(-90,90)
+    ranLon = random.uniform(-180,180)
+    pano = sv.GetPanoramaMetadata(lat=ranLat, lon=ranLon )
 
 #pano = sv.GetPanoramaMetadata(lat=55.001227, lon=-1.631196, radius = 50) #elgy
 #pano = sv.GetPanoramaMetadata(lat=42.345601, lon = -71.098348, radius = 50) #USA
+
+
+print "Your destination is (" + str(ranLat) + "," + str(ranLon) + ")\n"
+
 if pano is None:
    print "empty panorama"
    exit()
 
-panImg = Image.new("RGB", (1668,832), "white")
+#panImg = Image.new("RGB", (1668,832), "white")
+panImg = Image.new("RGB", (3330,1665), "white")
+# range 4,2 for zoom level 2
 
-for i in range(0,4):
-    for j in range(0,2):
-        tileData = sv.GetPanoramaTile(pano.PanoId,2, i, j)
+for i in range(0,7):
+    for j in range(0,4):
+        tileData = sv.GetPanoramaTile(pano.PanoId,3, i, j)
         tileBuffer = StringIO()
         tileBuffer.write(tileData)
         tileBuffer.seek(0)
@@ -32,10 +43,7 @@ for i in range(0,4):
         tileImg = Image.open(tileBuffer)
         panImg.paste(tileImg, (512*i,512*j))
 
-output = open("pan40.jpg","wb")
 panImg.save("pan1.jpg")
-#output.write(tile)
-#output.close()
 
 
 # depth map is 512x256 image, and a bunch of plane normals and distances to origin
