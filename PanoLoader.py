@@ -11,10 +11,21 @@ print "loading pano"
 #pano = sv.GetPanoramaMetadata(None,54.977275,1.614743,20000)
 #pano = sv.GetPanoramaMetadata(lat=27.683528, lon=-99.580078)
 #pano = sv.GetPanoramaMetadata(lat=54.977275, lon=-1.614743) # NCL Grey Street
-pano = sv.GetPanoramaMetadata(lat=(random.uniform(-90,90)), lon=(random.uniform(-180,180)))
+#pano = sv.GetPanoramaMetadata(lat=(random.uniform(-90,90)), lon=(random.uniform(-180,180)))
+pano = None
+mode = "london"
+
+
 while pano is None:
-    ranLat = random.uniform(-90,90)
-    ranLon = random.uniform(-180,180)
+    if (mode=="london"):
+        ranLat = random.uniform(51.3,51.6)
+        ranLon = random.uniform(-0.2,0.1)
+    elif (mode=="uk"):
+        ranLat = random.uniform(50,60)
+        ranLon = random.uniform(-10,3)
+    else:
+        ranLat = random.uniform(-90,90)
+        ranLon = random.uniform(-180,180)
     pano = sv.GetPanoramaMetadata(lat=ranLat, lon=ranLon )
 
 #pano = sv.GetPanoramaMetadata(lat=55.001227, lon=-1.631196, radius = 50) #elgy
