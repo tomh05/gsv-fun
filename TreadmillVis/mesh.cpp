@@ -106,6 +106,35 @@ int Mesh::buildMesh() {
     meshVertices = new QList<QVector3D>();
     meshTexCoords = new QList<QVector3D>();
 
+    /////////////////////////
+
+    for (int i = 1;i<distances->length();i++){ // for each plane
+        // find start pixel
+        int xStart = 0;
+        int yStart = 0;
+        for (int y = 0;y<yCells-20;y++){   // xy search
+            for (int x = 0;x<xCells;x++) {
+                if (indices->at(x+y*xCells) ==i) {
+                    xStart = x;
+                    yStart = y;
+                    break;
+                }
+            }
+            if (xStart !=0) break;
+        }
+
+       // contour trace
+
+
+        //append start pixel to contour list
+
+        // look
+        //http://www.imageprocessingplace.com/downloads_V3/root_downloads/tutorials/contour_tracing_Abeer_George_Ghuneim/moore.html
+
+
+    }
+
+   /////////////////////////
     for (int j = 0;j<yCells-20;j++){
         for (int i = 0;i<xCells;i++) {
 
