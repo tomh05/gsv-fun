@@ -16,6 +16,11 @@
 
 
 #include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
+
+#include <glu.h>
 
 
 
@@ -41,12 +46,24 @@ private:
     QList<double> * distances;
 
 
+
+
     QVector3D unitVectorFromPx(int x, int y, int w, int h);
     GLuint texID;
     QImage* panImg;
     QList<QVector3D>* meshVertices;
     QList<QVector3D>* meshTexCoords;
 
-};
+    QList<QList<QVector3D> >* polygons;
+    QList<QList<QVector3D> >* textures;
+
+    QPoint nextFrom(QPoint p, QPoint b);
+
+
+    //tesselation to deal with concave meshes;
+    //GLUtesselator *tess;
+    //void tcbBegin(GLenum prim);
+    //void tcbVertex(GLvoid *data);
+    //void tcbEnd();
 
 #endif // MESH_H

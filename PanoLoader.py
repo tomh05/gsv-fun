@@ -8,14 +8,16 @@ from StringIO import StringIO
 import random
 
 print "loading pano"
+
+pano = None
+
 #pano = sv.GetPanoramaMetadata(None,54.977275,1.614743,20000)
 #pano = sv.GetPanoramaMetadata(lat=27.683528, lon=-99.580078)
-#pano = sv.GetPanoramaMetadata(lat=54.977275, lon=-1.614743) # NCL Grey Street
+pano = sv.GetPanoramaMetadata(lat=54.977275, lon=-1.614743) # NCL Grey Street
 #pano = sv.GetPanoramaMetadata(lat=(random.uniform(-90,90)), lon=(random.uniform(-180,180)))
-pano = None
+
+
 mode = "london"
-
-
 while pano is None:
     if (mode=="london"):
         ranLat = random.uniform(51.3,51.6)
@@ -32,7 +34,7 @@ while pano is None:
 #pano = sv.GetPanoramaMetadata(lat=42.345601, lon = -71.098348, radius = 50) #USA
 
 
-print "Your destination is (" + str(ranLat) + "," + str(ranLon) + ")\n"
+#print "Your destination is (" + str(ranLat) + "," + str(ranLon) + ")\n"
 
 if pano is None:
    print "empty panorama"

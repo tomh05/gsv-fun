@@ -6,6 +6,13 @@ Mesh::Mesh(QWidget *parent) :
     indices = new QList<int>();
     normals = new QList<QVector3D>();
     distances = new QList<double>();
+
+
+    GLUtesselator *tess = gluNewTess();
+    //gluTessCallback (tess, GLU_TESS_BEGIN, tcbBegin);
+    //gluTessCallback (tess, GLU_TESS_VERTEX, tcbVertex);
+   // gluTessCallback (tess, GLU_TESS_END, tcbEnd);
+
 #ifdef __linux__
     panImg = new QImage("/home/tomh/Projects/treadmill/gsv-fun/pan1.jpg");
 #else
@@ -98,6 +105,25 @@ QVector3D Mesh::unitVectorFromPx(int x, int y, int w, int h)
     return QVector3D(vx,vy,vz).normalized();
 }
 
+
+QPoint Mesh::nextFrom(QPoint p, QPoint b) {
+    QPoint r;
+
+    QPoint d = b-p;
+    if      (d == QPoint(-1,-1)) r = p + QPoint( 0,-1);
+    else if (d == QPoint( 0,-1)) r = p + QPoint( 1,-1);
+    else if (d == QPoint( 1,-1)) r = p + QPoint( 1, 0);
+    else if (d == QPoint( 1, 0)) r = p + QPoint( 1, 1);
+    else if (d == QPoint( 1, 1)) r = p + QPoint( 0, 1);
+    else if (d == QPoint( 0, 1)) r = p + QPoint(-1, 1);
+    else if (d == QPoint(-1, 1)) r = p + QPoint(-1, 0);
+    else if (d == QPoint(-1, 0)) r = p + QPoint(-1,-1);
+    else {
+        qDebug()<<"ERROR!!!";
+    }
+    return r;
+}
+
 // build a mesh composed of 512x256 quads, each corresponding to a plane defined in the GSV depth map.
 int Mesh::buildMesh() {
     int xCells = 512;
@@ -107,8 +133,8 @@ int Mesh::buildMesh() {
     meshTexCoords = new QList<QVector3D>();
 
     /////////////////////////
-
-    for (int i = 1;i<distances->length();i++){ // for each plane
+/*
+    for (int i = 1;i< distances->length();i++){ // for each plane (depth map intensity)
         // find start pixel
         int xStart = 0;
         int yStart = 0;
@@ -124,8 +150,49 @@ int Mesh::buildMesh() {
         }
 
        // contour trace
+        QPoint M[] = { QPoint(-1,-1),QPoint(0,-1),QPoint(1,-1),
+                        QPoint(1,0), QPoint(1,1), QPoint(0,1),
+                        QPoint(-1,1),QPoint(-1,0) };
 
+        QPoint s = QPoint(xStart,yStart);
 
+        qDebug()<<"start "<<s;
+        QList<QPoint> B; // boundary pixels.
+        B.append(s);
+        QPoint p = s;
+        //int b = 7; // b = left
+        QPoint b;
+        b = s + QPoint(-1,0);
+        QPoint c;
+        //c = p + M[(b+1)%7];
+        c = nextFrom(p,b);
+        int limit = 80;
+        int test = 0;
+        while (c !=s && test < limit) {
+        test++;
+        //qDebug()<<"indices is"<<indices->at(c.x()+c.y()*xCells) ;
+            if (indices->at(c.x()+c.y()*xCells) == i) {
+                //qDebug()<<"yes!";
+        qDebug()<<"c is"<<c;
+                B.append(c);
+                //b = p;
+                //b = (b+1)%7;
+                p = c;
+                //c = p + M[(b+1)%7];
+                //c = nextFrom(p,b);
+                c = b;
+
+            } else {
+                //qDebug()<<"no!";
+                b = c;
+                //b = (b+1)%7;
+                //c = p + M[(b+1)%7];
+                c = nextFrom(p,b);
+            }
+
+        }
+
+        qDebug()<<"B long"<<B.length();
         //append start pixel to contour list
 
         // look
@@ -133,8 +200,85 @@ int Mesh::buildMesh() {
 
 
     }
+*/
 
-   /////////////////////////
+
+    polygons = new QList<QList<QVector3D> >();
+    textures = new QList<QList<QVector3D> >();
+    //for (int i = 1;i< distances->length();i++){ // for each plane (depth map intensity)
+    for (int i = 4;i< 5;i++){ // for each plane (depth map intensity)
+
+        qDebug()<<"i is "<<i;
+        // create binary image, white = current plane level
+        cv::Mat binMat = cv::Mat(256,512,CV_8U,0.0);
+        for (int y = 0;y<256;y++) {
+            for (int x = 0;x<512;x++) {
+                if (indices->at(x+y*xCells) == i) {
+                    binMat.at<char>(x+y*xCells) = 255;
+                }
+            }
+        }
+        // get contours of image
+        cv::vector<cv::vector<cv::Point> > contours;
+        cv::findContours(binMat,contours,CV_RETR_EXTERNAL,CV_CHAIN_APPROX_SIMPLE);
+
+        /*for (int ci=0;ci<contours.size();ci++) {
+            qDebug()<<"got a contour "<<ci;
+        }
+        cv::drawContours(binMat,contours,0,cv::Scalar(255,0,0));
+        cv::namedWindow("window");
+        cv::imshow("window",binMat);
+        */
+
+        // for each contour found, convert each contour point to 3d and append
+        for (int k=0; k<contours.size(); k++) {
+
+            //QList<QVector3D> newPoly = new QList<QVector3D>();
+            QList<QVector3D> newPoly;
+            QList<QVector3D> newTex;
+            for (int m = 0; m < contours.at(k).size(); m++) {
+
+                // get new polygon in 3d
+                int curX = contours.at(k).at(m).x;
+                int curY = contours.at(k).at(m).y;
+
+                QVector3D viewVector = unitVectorFromPx(curX, curY, xCells , yCells );
+                int index = indices->at(curX+curY*xCells);
+
+                qreal n1 = normals->at(index).x();
+                qreal n2 = normals->at(index).y();
+                qreal n3 = normals->at(index).z();
+                // convert from GSV to OpenGL coordinate system
+                QVector3D n = QVector3D(n1,-n3,-n2);
+
+                // intersection of line from origin to quad vertex, with the plane defined by normal n and distance in distances[]
+                qreal d1 = - distances->at(index) / ( QVector3D::dotProduct(viewVector, n));
+
+                viewVector *= d1;
+
+                qreal offset = 0.;
+                qreal si =  offset + ((qreal) curX ) / ((qreal) xCells);
+                if (si>1.0) si -= 1.0;
+                qreal sj = ((qreal) (yCells - curY)) / ((qreal)yCells);
+
+
+                qreal len = viewVector.length();
+
+
+
+                newPoly.append(viewVector);
+                newTex.append(QVector3D(len*si,len*sj,len));
+
+
+            }
+            polygons->append(newPoly);
+            textures->append(newTex);
+        }
+
+    }
+    return 0;
+
+    /////////////////////////
     for (int j = 0;j<yCells-20;j++){
         for (int i = 0;i<xCells;i++) {
 
@@ -185,16 +329,6 @@ int Mesh::buildMesh() {
 
                 if (d1<0 || d2<0 || d3<0 || d4<0) continue;
 
-                /*
-                 if (d1 < 0) {
-                    qDebug()<<"skipping index "<<index;
-                    qDebug()<<"distances "<<d1;
-                    qDebug()<<"normal "<<n;
-                    qDebug()<<"c1 "<<c1;
-                    continue;
-                }
-                */
-
             }
 
             // scale quad corner unit vectors by computed distance
@@ -239,10 +373,32 @@ int Mesh::drawMesh()
 {
     glEnable(GL_TEXTURE_2D);
     texID = bindTexture(*panImg);
-                glColor4f(1,1,1,1);
+    glColor4f(1,1,1,1);
+
+    for (int i=0; i<polygons->length();i++) {
+        //gluTessBeginPolygon (tess, NULL);
+        //gluTessBeginContour (tess);
+        //glBegin(GL_POLYGON);
+        for (int j=0; j<polygons->at(i).length();j++) {
+            // Draw Quads
+            //glTexCoord4f(textures->at(i).at(j).x(),textures->at(i).at(j).y(), 0, textures->at(i).at(j).z());
+            //glVertex3f(polygons->at(i).at(j).x(), polygons->at(i).at(j).y(), polygons->at(i).at(j).z());
+            //gluTessVertex (tess, textures->at([i], data[i]));
+        }
+        //gluTessEndContour (tess);
+        //gluEndPolygon (tess);
+        //  glEnd();
+    }
 
 
-        glBegin(GL_QUADS);
+    return 0;
+    /////////////////////////////////////////////////////////
+    glEnable(GL_TEXTURE_2D);
+    texID = bindTexture(*panImg);
+    glColor4f(1,1,1,1);
+
+
+    glBegin(GL_QUADS);
     for (int i=0; i<meshVertices->length();i++)
     {
         // Draw Quads
@@ -250,7 +406,23 @@ int Mesh::drawMesh()
         glVertex3f(meshVertices->at(i).x(), meshVertices->at(i).y(), meshVertices->at(i).z());
     }
 
-        glEnd();
+    glEnd();
 
     return 0;
 }
+/*
+void Mesh::tcbBegin (GLenum prim)
+{
+   glBegin (prim);
+}
+
+void Mesh::tcbVertex (GLvoid *data)
+{
+   glVertex3dv((GLdouble *)data);
+}
+
+void Mesh::tcbEnd ();
+{
+   glEnd ();
+}*/
+
