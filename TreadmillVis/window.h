@@ -7,8 +7,6 @@
 #include "glwidget.h"
 #include "imgwidget.h"
 #include "mesh.h"
-#include <QSlider>
-#include <QLineEdit>
 
 
 class Window : public QWidget

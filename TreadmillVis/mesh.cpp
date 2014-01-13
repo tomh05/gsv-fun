@@ -1,5 +1,15 @@
 #include "mesh.h"
 
+
+void tcbVertex (GLvoid *data) {
+    GLdouble * vert;
+    vert = (GLdouble *) data;
+    glTexCoord4dv((GLdouble *) (vert+3));
+    //glTexCoord4d(*(vert+3),*(vert+4),*(vert+5),*(vert+6));
+    //glVertex3d(*(vert),*(vert+1),*(vert+2));
+    glVertex3dv((GLdouble *)vert);
+}
+
 Mesh::Mesh(QWidget *parent) :
     QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
 {
@@ -7,11 +17,12 @@ Mesh::Mesh(QWidget *parent) :
     normals = new QList<QVector3D>();
     distances = new QList<double>();
 
-
-    GLUtesselator *tess = gluNewTess();
-    //gluTessCallback (tess, GLU_TESS_BEGIN, tcbBegin);
-    //gluTessCallback (tess, GLU_TESS_VERTEX, tcbVertex);
-   // gluTessCallback (tess, GLU_TESS_END, tcbEnd);
+    tess = gluNewTess();
+    gluTessCallback(tess, GLU_TESS_BEGIN, (GLvoid (*)()) &glBegin);
+    //gluTessCallback(tess, GLU_TESS_VERTEX, (GLvoid (*)()) &(tcbVertex));
+    gluTessCallback(tess, GLU_TESS_VERTEX, (GLvoid (*)()) &tcbVertex);
+    //gluTessCallback(tess, GLU_TESS_VERTEX, (GLvoid (*)()) glVertex3dv);
+    gluTessCallback(tess, GLU_TESS_END, &glEnd);
 
 #ifdef __linux__
     panImg = new QImage("/home/tomh/Projects/treadmill/gsv-fun/pan1.jpg");
@@ -132,6 +143,7 @@ int Mesh::buildMesh() {
     meshVertices = new QList<QVector3D>();
     meshTexCoords = new QList<QVector3D>();
 
+    if (mode=="planes") {
     /////////////////////////
 /*
     for (int i = 1;i< distances->length();i++){ // for each plane (depth map intensity)
@@ -205,10 +217,9 @@ int Mesh::buildMesh() {
 
     polygons = new QList<QList<QVector3D> >();
     textures = new QList<QList<QVector3D> >();
-    //for (int i = 1;i< distances->length();i++){ // for each plane (depth map intensity)
-    for (int i = 4;i< 5;i++){ // for each plane (depth map intensity)
+    for (int i = 1;i< distances->length();i++){ // for each plane (depth map intensity)
+    //for (int i = 4;i< 5;i++){ // for each plane (depth map intensity)
 
-        qDebug()<<"i is "<<i;
         // create binary image, white = current plane level
         cv::Mat binMat = cv::Mat(256,512,CV_8U,0.0);
         for (int y = 0;y<256;y++) {
@@ -257,9 +268,9 @@ int Mesh::buildMesh() {
                 viewVector *= d1;
 
                 qreal offset = 0.;
-                qreal si =  offset + ((qreal) curX ) / ((qreal) xCells);
+                qreal si =  offset + ((qreal) curX ) / ((qreal) xCells-1);
                 if (si>1.0) si -= 1.0;
-                qreal sj = ((qreal) (yCells - curY)) / ((qreal)yCells);
+                qreal sj = ((qreal) (yCells - curY)) / ((qreal)yCells-1);
 
 
                 qreal len = viewVector.length();
@@ -276,8 +287,60 @@ int Mesh::buildMesh() {
         }
 
     }
-    return 0;
 
+        for (int j = 0;j<yCells-20;j++){
+        for (int i = 0;i<xCells;i++) {
+
+            if (indices->at(i+j*xCells) !=0) continue;
+  // get unit vectors pointing towards quad corners
+            // top left, bottom left, bottom right, top right
+            QVector3D c1 = unitVectorFromPx( i    , j, xCells , yCells );
+            QVector3D c2 = unitVectorFromPx( i   , (j+1), xCells , yCells );
+            QVector3D c3 = unitVectorFromPx( (i+1), (j+1), xCells , yCells );
+            QVector3D c4 = unitVectorFromPx( (i+1), j, xCells , yCells );
+            qreal d1,d2,d3,d4;
+
+                d1 = 100.0;
+                d2 = d1;
+                d3 = d1;
+                d4 = d1;
+
+            // scale quad corner unit vectors by computed distance
+            c1 = d1 * c1;
+            c2 = d2 * c2;
+            c3 = d3 * c3;
+            c4 = d4 * c4;
+
+            // Compute texture coordinates
+            qreal offset = 0.;
+            //qreal si =  (offset + 1.0f - ((qreal)i ) / xCells);
+            qreal si =  (offset + ((qreal)i ) / (qreal)xCells);
+            if (si>1.0) si -= 1.0;
+            //qreal sii =  (offset + 1.0f - ((qreal)i+1 ) / xCells);
+            qreal sii =  (offset + ((qreal)i-1 ) / (qreal)xCells);
+            if (sii>1.0) sii -= 1.0;
+            qreal sj = ((qreal) yCells - j) / (qreal)yCells;
+            qreal sjj = ((qreal) yCells - j-1) / (qreal)yCells;
+
+            qreal l1 = c1.length();
+            qreal l2 = c2.length();
+            qreal l3 = c3.length();
+            qreal l4 = c4.length();
+
+            meshVertices->append(QVector3D(c1));
+            meshVertices->append(QVector3D(c2));
+            meshVertices->append(QVector3D(c3));
+            meshVertices->append(QVector3D(c4));
+
+            meshTexCoords->append(QVector3D(l1*sii,l1*sjj,l1));
+            meshTexCoords->append(QVector3D(l2*sii,l2*sjj,l2));
+            meshTexCoords->append(QVector3D(l3*si,l3*sjj,l3));
+            meshTexCoords->append(QVector3D(l4*si,l4*sj,l4));
+
+        }
+        }
+    return 0;
+} else {
     /////////////////////////
     for (int j = 0;j<yCells-20;j++){
         for (int i = 0;i<xCells;i++) {
@@ -366,32 +429,58 @@ int Mesh::buildMesh() {
         }
     }
     return 0;
+    }
 }
 
 
 int Mesh::drawMesh()
 {
+    if (mode == "planes") {
     glEnable(GL_TEXTURE_2D);
     texID = bindTexture(*panImg);
     glColor4f(1,1,1,1);
 
     for (int i=0; i<polygons->length();i++) {
-        //gluTessBeginPolygon (tess, NULL);
-        //gluTessBeginContour (tess);
+        gluTessProperty(tess,GLU_TESS_WINDING_RULE,GLU_TESS_WINDING_POSITIVE);
+        gluTessBeginPolygon (tess, NULL);
+        gluTessBeginContour (tess);
         //glBegin(GL_POLYGON);
+        GLdouble vert[7*polygons->at(i).length()];
         for (int j=0; j<polygons->at(i).length();j++) {
             // Draw Quads
             //glTexCoord4f(textures->at(i).at(j).x(),textures->at(i).at(j).y(), 0, textures->at(i).at(j).z());
             //glVertex3f(polygons->at(i).at(j).x(), polygons->at(i).at(j).y(), polygons->at(i).at(j).z());
-            //gluTessVertex (tess, textures->at([i], data[i]));
+            vert[0 + j*7] =  polygons->at(i).at(j).x();
+            vert[1 + j*7] =  polygons->at(i).at(j).y();
+            vert[2 + j*7] =  polygons->at(i).at(j).z();
+            vert[3 + j*7] =  textures->at(i).at(j).x();
+            vert[4 + j*7] =  textures->at(i).at(j).y();
+            vert[5 + j*7] =  0;
+            vert[6 + j*7] =  textures->at(i).at(j).z();
+            //            GLdouble vert[7] = { polygons->at(i).at(j).x(),  polygons->at(i).at(j).y(),  polygons->at(i).at(j).z(),
+            //                  textures->at(i).at(j).x(),  textures->at(i).at(j).y(), 0.0,
+             //                 textures->at(i).at(j).z() };
+            //qDebug()<<"vert"<<vert[j*7];
+            //qDebug()<<"vert"<<vert[j*7+1];
+            //qDebug()<<"vert"<<vert[j*7+2];
+            gluTessVertex (tess, vert +j*7 , vert + j*7);
         }
-        //gluTessEndContour (tess);
-        //gluEndPolygon (tess);
+        gluTessEndContour (tess);
+        gluEndPolygon (tess);
         //  glEnd();
     }
 
+  glBegin(GL_QUADS);
+    for (int i=0; i<meshVertices->length();i++) {
+        // Draw Quads
+        glTexCoord4f(meshTexCoords->at(i).x(),meshTexCoords->at(i).y(), 0, meshTexCoords->at(i).z());
+        glVertex3f(meshVertices->at(i).x(), meshVertices->at(i).y(), meshVertices->at(i).z());
+}
+
+    glEnd();
 
     return 0;
+    } else {
     /////////////////////////////////////////////////////////
     glEnable(GL_TEXTURE_2D);
     texID = bindTexture(*panImg);
@@ -409,20 +498,6 @@ int Mesh::drawMesh()
     glEnd();
 
     return 0;
+    }
 }
-/*
-void Mesh::tcbBegin (GLenum prim)
-{
-   glBegin (prim);
-}
-
-void Mesh::tcbVertex (GLvoid *data)
-{
-   glVertex3dv((GLdouble *)data);
-}
-
-void Mesh::tcbEnd ();
-{
-   glEnd ();
-}*/
 

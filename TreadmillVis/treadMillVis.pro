@@ -19,7 +19,6 @@ HEADERS += \
     window.h \
     glwidget.h \
     imgwidget.h \
-    camera.h \
     mesh.h
 
 INCLUDEPATH += ../shared

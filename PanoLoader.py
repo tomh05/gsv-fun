@@ -13,9 +13,10 @@ pano = None
 
 #pano = sv.GetPanoramaMetadata(None,54.977275,1.614743,20000)
 #pano = sv.GetPanoramaMetadata(lat=27.683528, lon=-99.580078)
-pano = sv.GetPanoramaMetadata(lat=54.977275, lon=-1.614743) # NCL Grey Street
 #pano = sv.GetPanoramaMetadata(lat=(random.uniform(-90,90)), lon=(random.uniform(-180,180)))
 
+
+#pano = sv.GetPanoramaMetadata(lat=54.977275, lon=-1.614743) # NCL Grey Street
 
 mode = "london"
 while pano is None:

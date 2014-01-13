@@ -81,7 +81,8 @@ void GLWidget::paintGL()
     glLoadIdentity();
     glClear (GL_DEPTH_BUFFER_BIT);
     gluLookAt(1 + qCos(0.1*theta),-1.0,10*qSin(theta*.1),
-              -3.0*qSin(0.14*theta),-1.0,-20*qSin(theta*0.13),
+              0 + qCos(0.1*theta),-1.0,10*qSin(theta*.1),
+    //          -3.0*qSin(0.14*theta),-1.0,-20*qSin(theta*0.13),
               0.0,1.0,0.0);
 
     //gluLookAt(100*qCos(theta),100,100.0*qSin(theta),
@@ -103,7 +104,7 @@ void GLWidget::paintGL()
               0.0,1.0,0.0);
     //renderScene();
 
-    theta += 0.2;
+    theta += 0.1;
 
 
 }

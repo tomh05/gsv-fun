@@ -20,9 +20,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 
-#include <glu.h>
-
-
+#include <opengl/glu.h>
 
 static const double Pi = 3.14159265358979323846264338327950288419717;
 
@@ -59,11 +57,12 @@ private:
 
     QPoint nextFrom(QPoint p, QPoint b);
 
-
+    QString mode = "planes";
+    //QString mode = "planes";
     //tesselation to deal with concave meshes;
-    //GLUtesselator *tess;
+    GLUtesselator *tess;
     //void tcbBegin(GLenum prim);
     //void tcbVertex(GLvoid *data);
     //void tcbEnd();
-
+};
 #endif // MESH_H
