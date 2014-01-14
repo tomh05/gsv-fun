@@ -2,11 +2,19 @@
 
 
 void tcbVertex (GLvoid *data) {
+
     GLdouble * vert;
     vert = (GLdouble *) data;
-    glTexCoord4dv((GLdouble *) (vert+3));
-    //glTexCoord4d(*(vert+3),*(vert+4),*(vert+5),*(vert+6));
-    //glVertex3d(*(vert),*(vert+1),*(vert+2));
+    //glTexCoord4dv((GLdouble *) (vert+3));
+    GLdouble s,t,r,q;
+    qreal len = QVector3D(*vert,*(vert+1),*(vert+2)).length();
+    s= len * *(vert+3);
+    t= len * *(vert+4);
+    r = 0.0;
+    q = len;
+
+    glTexCoord4d(s,t,r,q);
+    glColor4f(0.01 * (qrand() % 100),0.01 * (qrand() % 100),0.01 * (qrand() % 100),1);
     glVertex3dv((GLdouble *)vert);
 }
 
@@ -33,6 +41,7 @@ Mesh::Mesh(QWidget *parent) :
 
 int Mesh::readDepthFiles()
 {
+    qDebug()<<"reading depth files";
     // indices file
     QFile iFile;
     QString iContents;
@@ -56,7 +65,6 @@ int Mesh::readDepthFiles()
     for (i = iA.begin(); i != iA.end(); ++i) {
         indices->append((*i).toDouble());
     }
-
 
 
     // planes file
@@ -95,6 +103,7 @@ int Mesh::readDepthFiles()
 
     }
 
+    qDebug()<<"read depth files";
     return 0;
 }
 
@@ -268,9 +277,9 @@ int Mesh::buildMesh() {
                 viewVector *= d1;
 
                 qreal offset = 0.;
-                qreal si =  offset + ((qreal) curX ) / ((qreal) xCells-1);
+                qreal si =  offset + ((qreal) curX ) / ((qreal) xCells);
                 if (si>1.0) si -= 1.0;
-                qreal sj = ((qreal) (yCells - curY)) / ((qreal)yCells-1);
+                qreal sj = ((qreal) (yCells - curY)) / ((qreal)yCells);
 
 
                 qreal len = viewVector.length();
@@ -278,7 +287,7 @@ int Mesh::buildMesh() {
 
 
                 newPoly.append(viewVector);
-                newTex.append(QVector3D(len*si,len*sj,len));
+                newTex.append(QVector3D(si,sj,len));
 
 
             }
@@ -332,10 +341,10 @@ int Mesh::buildMesh() {
             meshVertices->append(QVector3D(c3));
             meshVertices->append(QVector3D(c4));
 
-            meshTexCoords->append(QVector3D(l1*sii,l1*sjj,l1));
-            meshTexCoords->append(QVector3D(l2*sii,l2*sjj,l2));
-            meshTexCoords->append(QVector3D(l3*si,l3*sjj,l3));
-            meshTexCoords->append(QVector3D(l4*si,l4*sj,l4));
+            meshTexCoords->append(QVector3D(sii,l1*sjj,l1));
+            meshTexCoords->append(QVector3D(sii,l2*sjj,l2));
+            meshTexCoords->append(QVector3D(si,l3*sjj,l3));
+            meshTexCoords->append(QVector3D(si,l4*sj,l4));
 
         }
         }
@@ -446,6 +455,7 @@ int Mesh::drawMesh()
         gluTessBeginContour (tess);
         //glBegin(GL_POLYGON);
         GLdouble vert[7*polygons->at(i).length()];
+
         for (int j=0; j<polygons->at(i).length();j++) {
             // Draw Quads
             //glTexCoord4f(textures->at(i).at(j).x(),textures->at(i).at(j).y(), 0, textures->at(i).at(j).z());

@@ -17,6 +17,7 @@ parser.add_argument("-q","--fov",dest="fov", default=90)
 parser.add_argument("-c","--client",dest="client")
 parser.add_argument("-k","--key",dest="key")
 parser.add_argument("-f","--folder",dest="foldername")
+parser.add_argument("-m","--mode",dest="mode", default="static")
 args = parser.parse_args()
 
 stepsFile = open("steps.json","r")
@@ -86,49 +87,54 @@ for s,step in enumerate(interpSteps):
 
         routeFile.write(routeFileLine)
 
-        imUrl = "http://maps.googleapis.com/maps/api/streetview?" \
-                + "size="+str(args.imageWidth) + "x" + str(args.imageHeight) \
-                + "&pano="+pano.PanoId  \
-                + "&heading="+ str(heading) \
-                + "&fov="+ str(args.fov) \
-                + "&sensor=false&client=" + args.client   
-        imUrl =  urlSigner.googleUrlSign(imUrl,args.key)
+        if (args.mode=="static"):
+            # fetch static image from API
+            imUrl = "http://maps.googleapis.com/maps/api/streetview?" \
+                    + "size="+str(args.imageWidth) + "x" + str(args.imageHeight) \
+                    + "&pano="+pano.PanoId  \
+                    + "&heading="+ str(heading) \
+                    + "&fov="+ str(args.fov) \
+                    + "&sensor=false&client=" + args.client   
+            imUrl =  urlSigner.googleUrlSign(imUrl,args.key)
 
-        imFromUrl = sv.GetUrlContents(imUrl)
-        imFile = open(args.foldername +'/'+ str(s) + '_' +pano.PanoId+'.jpg','wb')
-        imFile.write(imFromUrl)
-        imFile.close()
+            imFromUrl = sv.GetUrlContents(imUrl)
+            imFile = open(args.foldername +'/'+ str(s) + '_' +pano.PanoId+'.jpg','wb')
+            imFile.write(imFromUrl)
+            imFile.close()
+
+        else:
+            # panorama grabbing for 3D
+            panImg = Image.new("RGB", (3330,1665), "white")
+
+            for i in range(0,7):
+                for j in range(0,4):
+                    tileData = sv.GetPanoramaTile(pano.PanoId,3, i, j)
+                    tileBuffer = StringIO()
+                    tileBuffer.write(tileData)
+                    tileBuffer.seek(0)
+                    tileImg = Image.open(tileBuffer)
+                    panImg.paste(tileImg, (512*i,512*j))
+
+            panImg.save(args.foldername + "/" + str(s) + '_' + pano.PanoId + ".jpg")
+
+
+            # depth map is 512x256 image, and a bunch of plane normals and distances to origin
+            indicesFile = open(args.foldername + "/" + str(s) + "_" + pano.PanoId +"_indices.json","wb")
+            simplejson.dump(pano.DepthMapIndices,indicesFile)
+            indicesFile.close()
+
+            planesFile = open(args.foldername + "/" + str(s) + "_" + pano.PanoId +"_planes.json","wb")
+            simplejson.dump(pano.DepthMapPlanes,planesFile);
+            planesFile.close()
+
+
+
+
+
 
 routeFile.close()
 print('\n')
 '''
-# panorama grabbing for 3D
-panImg = Image.new("RGB", (3330,1665), "white")
-
-for i in range(0,7):
-    for j in range(0,4):
-        tileData = sv.GetPanoramaTile(pano.PanoId,3, i, j)
-        tileBuffer = StringIO()
-        tileBuffer.write(tileData)
-        tileBuffer.seek(0)
-        #tileImg = Image.new("RGB", (512,512), None)
-        #tileImg = Image.frombuffer("RGB",(512,512),jpg,"raw"
-        #tileImg = Image.fromstring('RGB',(512,512),tileData,"jpeg",0,0)
-        tileImg = Image.open(tileBuffer)
-        panImg.paste(tileImg, (512*i,512*j))
-
-panImg.save("img/" +pano.PanoId + ".jpg")
-
-
-# depth map is 512x256 image, and a bunch of plane normals and distances to origin
-indicesFile = open("indices.json","wb")
-simplejson.dump(pano.DepthMapIndices,indicesFile)
-indicesFile.close()
-
-planesFile = open("planes.json","wb")
-simplejson.dump(pano.DepthMapPlanes,planesFile);
-planesFile.close()
-
 '''
 
 

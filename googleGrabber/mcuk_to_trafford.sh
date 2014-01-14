@@ -14,11 +14,11 @@ fov=80
 client="gme-britishbroadcasting"
 key="ZFb0O2mmKm_HXX6Fi4vYIUj6SQU="
 
-rm -r $foldername
+rm -rf $foldername
 mkdir -p $foldername
 node routeGrab.js --from="$from" --to="$to"
 echo "Route fetched"
 echo "Grabbing images"
-python streetViewGrab.py --client "$client" --key "$key" -W $imageWidth -H $imageHeight --fov $fov --folder $foldername
+python streetViewGrab.py --client "$client" --key "$key" -W $imageWidth -H $imageHeight --fov $fov --folder $foldername --mode $mode
 rm steps.json
 echo "Grabbed"

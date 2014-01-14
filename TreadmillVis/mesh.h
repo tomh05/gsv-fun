@@ -19,9 +19,11 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-
+#ifdef __linux__
+#include <GL/glu.h>
+#else
 #include <opengl/glu.h>
-
+#endif
 static const double Pi = 3.14159265358979323846264338327950288419717;
 
 class Mesh : public QGLWidget
