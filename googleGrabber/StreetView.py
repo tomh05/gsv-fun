@@ -28,8 +28,9 @@ def GetPanoramaMetadata(panoid = None, lat = None, lon = None, radius = 2000):
     url += '&pm=1'				# include pano map
     if panoid == None:
         url += '&ll=%s,%s'		# lat/lon to search at
-        url += '&radius=%s'		# search radius
-        url = url % (BaseUri, lat, lon, radius)
+        #url += '&radius=%s'		# search radius
+        #url = url % (BaseUri, lat, lon, radius)
+        url = url % (BaseUri, lat, lon)
     else:
         url += '&panoid=%s'		# panoid to retrieve
         url = url % (BaseUri, panoid)
