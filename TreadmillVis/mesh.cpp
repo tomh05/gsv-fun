@@ -1,21 +1,71 @@
 #include "mesh.h"
 
+void tcbBegin (GLenum data) {
+    //qDebug()<<"beginning";
+
+    //glBegin(data);
+    //glBegin(GL_TRIANGLE_STRIP);
+    glBegin(GL_TRIANGLES);
+
+}
 
 void tcbVertex (GLvoid *data) {
 
     GLdouble * vert;
     vert = (GLdouble *) data;
     //glTexCoord4dv((GLdouble *) (vert+3));
+    //qDebug()<<"making vertex";
+
     GLdouble s,t,r,q;
     qreal len = QVector3D(*vert,*(vert+1),*(vert+2)).length();
     s= len * *(vert+3);
     t= len * *(vert+4);
     r = 0.0;
     q = len;
-
     glTexCoord4d(s,t,r,q);
-    glColor4f(0.01 * (qrand() % 100),0.01 * (qrand() % 100),0.01 * (qrand() % 100),1);
+
+    //glColor4f(0.01 * (qrand() % 100),0.01 * (qrand() % 100),0.01 * (qrand() % 100),1);
     glVertex3dv((GLdouble *)vert);
+}
+
+void tcbEnd (GLvoid *data) {
+    //qDebug()<<"ending";
+    glEnd();
+
+}
+void tcbCombine( GLdouble coords[3], GLdouble *vertexData[4],GLfloat weight[4], GLdouble **dataOut ) {
+
+    GLdouble *vertex; // new vertex
+
+    vertex = (GLdouble *) malloc(7*sizeof(GLdouble));
+    vertex[0] = coords[0];
+    vertex[1] = coords[1];
+    vertex[2] = coords[2];
+    GLdouble s,t,r,q;
+    qreal len = QVector3D(coords[0],coords[1],coords[2]).length();
+    s = 0.0;
+    t = 0.0;
+    for (int i=0; i<4; i++) {
+        if (weight[i]>0) {
+            s += weight[i] * vertexData[i][3];
+            t += weight[i] * vertexData[i][4];
+        }
+    }
+    r = 0.0;
+    q = len;
+
+
+    vertex[3] = s;
+    vertex[4] = t;
+    vertex[5] = r;
+    vertex[6] = q;
+
+    *dataOut = vertex;
+
+}
+
+void tcbEdge (GLvoid *data) {
+    return; // force GL_Triangles
 }
 
 Mesh::Mesh(QWidget *parent) :
@@ -26,18 +76,104 @@ Mesh::Mesh(QWidget *parent) :
     distances = new QList<double>();
 
     tess = gluNewTess();
-    gluTessCallback(tess, GLU_TESS_BEGIN, (GLvoid (*)()) &glBegin);
+    //gluTessCallback(tess, GLU_TESS_BEGIN, (GLvoid (*)()) &glBegin);
+    gluTessCallback(tess, GLU_TESS_BEGIN, (GLvoid (*)()) &tcbBegin);
     //gluTessCallback(tess, GLU_TESS_VERTEX, (GLvoid (*)()) &(tcbVertex));
     gluTessCallback(tess, GLU_TESS_VERTEX, (GLvoid (*)()) &tcbVertex);
     //gluTessCallback(tess, GLU_TESS_VERTEX, (GLvoid (*)()) glVertex3dv);
-    gluTessCallback(tess, GLU_TESS_END, &glEnd);
+    //gluTessCallback(tess, GLU_TESS_END, &glEnd);
+    gluTessCallback(tess, GLU_TESS_END, (GLvoid (*)()) &tcbEnd);
+    gluTessCallback(tess, GLU_TESS_COMBINE, (GLvoid (*)()) &tcbCombine);
+    gluTessCallback(tess, GLU_TESS_EDGE_FLAG_DATA, (GLvoid (*)()) &tcbEdge);
 
 #ifdef __linux__
     panImg = new QImage("/home/tomh/Projects/treadmill/gsv-fun/pan1.jpg");
 #else
     panImg = new QImage("/Users/tom/Programming/BBC/Treadmill/pan1.jpg");
 #endif
+
+    /*
+    shader = new QGLShader(QGLShader::Fragment,this);
+    qDebug()<<"shaer compile"<<shader->compileSourceCode("uniform mediump vec4 color;\n"
+                              "void main(void)\n"
+                              "{\n"
+                              "     gl_FragColor = color;\n"
+                              "} \n");
+    qDebug()<<"log"<<shader->log();
+
+    qDebug()<<"stat"<<glGetString(GL_SHADING_LANGUAGE_VERSION);
+    bool result = shader->compileSourceFile("/home/tomh/Projects/treadmill/gsv-fun/TreadmillVis/shader.fsh");
+    if (!result) {
+        qDebug()<<"shader compilation failed: "<<shader->log();
+    }
+
+    shaderProgram = new QGLShaderProgram(this);
+    shaderProgram->addShaderFromSourceCode(QGLShader::Vertex,
+                                           "varying vec4 worldCoord;\n"
+                                           "void main(void)\n"
+                                           "{\n"
+                                           "  worldCoord = gl_ModelViewMatrix * gl_Vertex ;\n"
+                                           "} \n");
+    // fragment shader:
+    // get x,y,z from varying vec4 worldCoord
+    // apply sin, cos to get tex coords
+    // gl_FragColor (or something else?) = texture(x_img,y_img)
+//http://stackoverflow.com/questions/12414708/correct-glsl-affine-texture-mapping
+//http://www.ozone3d.net/tutorials/glsl_texturing_p02.php
+   // http://qt-project.org/doc/qt-4.8/qglshaderprogram.html
+    // TODO: apply the actual shader, get it working
+    //http://stackoverflow.com/questions/16563234/opengl-texture-mapping-in-vertex-or-fragment-shader
+   qDebug()<<"compile" << shaderProgram->addShaderFromSourceCode(QGLShader::Fragment,
+                                           "varying vec4 worldCoord;\n"
+                                           "uniform sampler2D _MainTex;\n"
+                                           "void main(void)\n"
+                                           "{\n"
+                                           "     vec2 position;\n"
+                                           "     position = vec2(0,0);\n"
+                                           "     gl_FragColor = texture2D(_MainTex, vec2 position);\n"
+                                           "} \n");
+   qDebug()<<shaderProgram->log();
+    qDebug()<< "link "<< shaderProgram->link();
+    qDebug()<< "link "<< shaderProgram->log();
+    qDebug()<< "bind "<< shaderProgram->bind();
+
+*/
+
+
 }
+
+void Mesh::initFragmentShader(QString fileName)
+{
+    context = cgCreateContext();
+    //for some reason, selecting the 'bestProfile' didnt work properly
+    //on my linux box. So I am setting the profile manually
+    bestProfile = cgGLGetLatestProfile(CG_GL_FRAGMENT);
+    qDebug()<<"best"<<bestProfile;
+
+    fragmentProgram = cgCreateProgramFromFile(context, CG_SOURCE,
+                                              fileName.toLocal8Bit(),
+                                              bestProfile /*CG_PROFILE_ARBFP1*/,
+                                              "frag", NULL);
+    qDebug() << "Fragment: "  << cgGetErrorString(cgGetError());
+    qDebug() <<  cgGetLastListing(context);
+
+    bestProfile = cgGLGetLatestProfile(CG_GL_VERTEX);
+    vertexProgram = cgCreateProgramFromFile(context, CG_SOURCE,
+                                              fileName.toLocal8Bit(),
+                                              bestProfile,
+                                              "vert", NULL);
+
+    qDebug() << "Vertex: "  << cgGetErrorString(cgGetError());
+    qDebug() <<  cgGetLastListing(context);
+
+    cgGLLoadProgram(fragmentProgram);
+    cgGLLoadProgram(vertexProgram);
+    modelViewMatrix = cgGetNamedParameter(vertexProgram,"matModelView");
+    qDebug() << cgGetErrorString(cgGetError());
+
+
+}
+
 
 int Mesh::readDepthFiles()
 {
@@ -231,24 +367,27 @@ int Mesh::buildMesh() {
 
         // create binary image, white = current plane level
         cv::Mat binMat = cv::Mat(256,512,CV_8U,0.0);
-        for (int y = 0;y<256;y++) {
-            for (int x = 0;x<512;x++) {
-                if (indices->at(x+y*xCells) == i) {
+        for (int y = 9;y<256-9;y++) {
+            for (int x = 9;x<512-9;x++) {
+                if (indices->at(x+y*xCells) == i || indices->at(x-1+y*xCells) ==i || indices->at(x+(y-1)*xCells) == i )  {
+                //if (indices->at(x+y*xCells) == i )  {
                     binMat.at<char>(x+y*xCells) = 255;
                 }
             }
         }
+                cv::namedWindow("window2");
+        cv::imshow("window2",binMat);
+
         // get contours of image
         cv::vector<cv::vector<cv::Point> > contours;
         cv::findContours(binMat,contours,CV_RETR_EXTERNAL,CV_CHAIN_APPROX_SIMPLE);
 
-        /*for (int ci=0;ci<contours.size();ci++) {
-            qDebug()<<"got a contour "<<ci;
-        }
+        //for (int ci=0;ci<contours.size();ci++) {
+        //    qDebug()<<"got a contour "<<ci;
+        //}
         cv::drawContours(binMat,contours,0,cv::Scalar(255,0,0));
         cv::namedWindow("window");
         cv::imshow("window",binMat);
-        */
 
         // for each contour found, convert each contour point to 3d and append
         for (int k=0; k<contours.size(); k++) {
@@ -263,8 +402,8 @@ int Mesh::buildMesh() {
                 int curY = contours.at(k).at(m).y;
 
                 QVector3D viewVector = unitVectorFromPx(curX, curY, xCells , yCells );
-                int index = indices->at(curX+curY*xCells);
-
+                //int index = indices->at(curX+curY*xCells);
+                int index = i;
                 qreal n1 = normals->at(index).x();
                 qreal n2 = normals->at(index).y();
                 qreal n3 = normals->at(index).z();
@@ -294,7 +433,7 @@ int Mesh::buildMesh() {
             polygons->append(newPoly);
             textures->append(newTex);
         }
-
+        //qDebug()<<"made it alive";
     }
 
         for (int j = 0;j<yCells-20;j++){
@@ -348,6 +487,8 @@ int Mesh::buildMesh() {
 
         }
         }
+
+        //qDebug()<<"made it alive 2";
     return 0;
 } else {
     /////////////////////////
@@ -444,10 +585,30 @@ int Mesh::buildMesh() {
 
 int Mesh::drawMesh()
 {
+    /*    bool result = shader->compileSourceFile("/home/tomh/Projects/treadmill/gsv-fun/TreadmillVis/shader.fsh");
+    if (!result) {
+        qDebug()<<"shader compilation failed: "<<shader->log();
+    }
+    */
+
     if (mode == "planes") {
+      //  qDebug()<<"drawing planes";
     glEnable(GL_TEXTURE_2D);
     texID = bindTexture(*panImg);
     glColor4f(1,1,1,1);
+
+
+
+
+    cgGLEnableProfile( cgGLGetLatestProfile(CG_GL_VERTEX));
+    cgGLBindProgram(vertexProgram);
+    cgGLSetStateMatrixParameter(modelViewMatrix, CG_GL_MODELVIEW_PROJECTION_MATRIX, CG_GL_MATRIX_IDENTITY);
+
+    cgGLEnableProfile( cgGLGetLatestProfile(CG_GL_FRAGMENT));
+    cgGLBindProgram(fragmentProgram);
+
+    //glTexGeni(GL_S,GL_TEXTURE_GEN_MODE,GL_SPHERE_MAP);
+    //glTexGeni(GL_T,GL_TEXTURE_GEN_MODE,GL_SPHERE_MAP);
 
     for (int i=0; i<polygons->length();i++) {
         gluTessProperty(tess,GLU_TESS_WINDING_RULE,GLU_TESS_WINDING_POSITIVE);
@@ -475,11 +636,15 @@ int Mesh::drawMesh()
             //qDebug()<<"vert"<<vert[j*7+2];
             gluTessVertex (tess, vert +j*7 , vert + j*7);
         }
+
         gluTessEndContour (tess);
-        gluEndPolygon (tess);
+        //gluEndPolygon (tess);
+        gluTessEndPolygon(tess);
         //  glEnd();
     }
 
+
+    //qDebug()<<"drawn planes";
   glBegin(GL_QUADS);
     for (int i=0; i<meshVertices->length();i++) {
         // Draw Quads
@@ -489,6 +654,7 @@ int Mesh::drawMesh()
 
     glEnd();
 
+    //qDebug()<<"returning";
     return 0;
     } else {
     /////////////////////////////////////////////////////////

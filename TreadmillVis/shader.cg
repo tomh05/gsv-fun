@@ -1,0 +1,69 @@
+// Vertex Shader
+uniform float4x4 matModelView;
+struct VertInput {
+    float4 position  : POSITION;
+    float4 color: COLOR;
+};
+
+struct vertOutput {
+float4 position: POSITION;
+float4 color    : COLOR;
+float3 texCoord : TEXCOORD0;
+};
+
+//vertOutput vert(float2 position: POSITION) {
+vertOutput vert(VertInput IN)  {
+//void vert(float2 oPosition: Position) {
+    vertOutput OUT;
+    //OUT.pos= float4(IN.pos,0,1);
+    //OUT.position = IN.position;
+    OUT.position = mul(matModelView,IN.position);
+    OUT.color = float4(1,1,1,1);
+
+    OUT.texCoord = float3(IN.position.x, IN.position.y, IN.position.z);
+    return OUT;
+    }
+
+
+
+//-------------------------------------------------------------------------------
+// Fragment Shader
+
+
+struct fragOutput {
+    float4 color : COLOR;
+};
+
+struct pixelIn {
+    float3 color: COLOR;
+    float3 texCoord : TEXCOORD0;
+};
+
+// two possible routes: either a vertex shader somehow does interpolation
+// or I send the pixel shader a coordinate in 3D for each pixel somehow?
+
+
+fragOutput frag(pixelIn IN, uniform sampler2D tex0: TEXUNIT0) {
+
+    const float pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062;
+
+    float3 v = normalize(IN.texCoord);
+    fragOutput OUT;
+    //OUT.color  = color;
+    //OUT.color  = tex2D(tex0,float2(0.4,0.4));
+
+    // trig to get image from tex
+    float theta =  atan2(IN.texCoord.x,IN.texCoord.z);
+    float xz = length(float2(IN.texCoord.x, IN.texCoord.y));
+
+    //float phi = - atan2(xz,IN.texCoord.y);
+    float phi =  asin(v.y) - 0.5*pi;
+
+
+    //OUT.color  = tex2D(tex0,float2(IN.texCoord.x / 512,IN.texCoord.y / 256));
+    OUT.color  = tex2D(tex0,float2( theta/ (2*pi), phi/pi));
+
+    //OUT.color  = float4(1,0,0,1);
+    //OUT.color  = float4(IN.texCoord.y / 50.0 ,0,0,1);
+    return OUT;
+}

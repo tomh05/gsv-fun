@@ -12,7 +12,10 @@ SOURCES += \
 #mac hack
 unix:!macx {
 LIBS += -lglut  \
-        -lGLU
+        -lGLU \
+         # CG shader libraries
+        -lCg \
+        -lCgGL
 }
 
 HEADERS += \
@@ -39,3 +42,6 @@ LIBS += -lopencv_calib3d \
 -lopencv_ml \
 -lopencv_objdetect \
 -lopencv_video
+
+OTHER_FILES += \
+    shader.cg

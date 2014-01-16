@@ -5,7 +5,6 @@
 #include <QList>
 #include <QDebug>
 #include <QTextStream>
-//#include <QRegularExpression>
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/qmath.h>
 
@@ -14,10 +13,21 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-
+// OpenCV
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
+
+
+#include <Cg/cg.h>
+#include <Cg/cgGL.h>
+
+
+
+// Shaders
+#include <QGLShaderProgram>
+
+
 
 #ifdef __linux__
 #include <GL/glu.h>
@@ -34,6 +44,7 @@ public:
     int readDepthFiles();
     int buildMesh();
     int drawMesh();
+    void initFragmentShader(QString fileName);
 signals:
 
 public slots:
@@ -66,5 +77,18 @@ private:
     //void tcbBegin(GLenum prim);
     //void tcbVertex(GLvoid *data);
     //void tcbEnd();
+
+
+    QGLShader * shader;
+    QGLShaderProgram * shaderProgram;
+
+
+    CGcontext context;
+    CGprogram vertexProgram;
+    CGprogram fragmentProgram;
+    CGprofile bestProfile;
+    CGparameter modelViewMatrix;
+
+
 };
 #endif // MESH_H
