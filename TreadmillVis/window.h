@@ -5,7 +5,6 @@
 #include <QGridLayout>
 #include <QTimer>
 #include "glwidget.h"
-#include "imgwidget.h"
 #include "mesh.h"
 
 
@@ -13,15 +12,15 @@ class Window : public QWidget
 {
     Q_OBJECT
 public:
-    explicit Window(QWidget *parent = 0);
+    explicit Window(GLWidget *_glWidget, QWidget *parent = 0);
     
 signals:
     
 public slots:
 
 private:
-    GLWidget *openGL;
-    Mesh *mesh;
+    GLWidget *glWidget;
+    //Mesh *mesh;
     
 };
 

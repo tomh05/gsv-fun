@@ -41,54 +41,51 @@ class Mesh : public QGLWidget
     Q_OBJECT
 public:
     explicit Mesh(QWidget *parent = 0);
-    int readDepthFiles();
+    int loadFiles();
     int buildMesh();
     int drawMesh();
-    void initFragmentShader(QString fileName);
+
+    void setOrigin(QVector3D o) { origin = o; }
+    void setPanoBearing(qreal b) { panoBearing = b; }
+
+    QVector3D getOrigin() { return origin; }
+    qreal getPanoBearing() { return panoBearing; }
+    void setFilePath(QString fp) { filePath = fp; }
+    bool loaded() { return isLoaded; }
+
 signals:
 
 public slots:
 
-
-
 private:
+    // GSV data
     QList<int> * indices;
     QList<QVector3D> * normals;
     QList<double> * distances;
 
+    bool isLoaded;
 
-
-
-    QVector3D unitVectorFromPx(int x, int y, int w, int h);
     GLuint texID;
+    GLuint sphereRenderList;
     QImage* panImg;
-    QList<QVector3D>* meshVertices;
-    QList<QVector3D>* meshTexCoords;
+
+    QVector3D origin;
+    qreal panoBearing;
+
+    QString filePath;
 
     QList<QList<QVector3D> >* polygons;
-    QList<QList<QVector3D> >* textures;
 
-    QPoint nextFrom(QPoint p, QPoint b);
+    //QPoint nextFrom(QPoint p, QPoint b);
+    //QList<QVector3D>* meshVertices;
+    //QList<QVector3D>* meshTexCoords;
+    //QList<QList<QVector3D> >* textures;
 
-    QString mode = "planes";
-    //QString mode = "planes";
     //tesselation to deal with concave meshes;
     GLUtesselator *tess;
-    //void tcbBegin(GLenum prim);
-    //void tcbVertex(GLvoid *data);
-    //void tcbEnd();
 
 
-    QGLShader * shader;
-    QGLShaderProgram * shaderProgram;
-
-
-    CGcontext context;
-    CGprogram vertexProgram;
-    CGprogram fragmentProgram;
-    CGprofile bestProfile;
-    CGparameter modelViewMatrix;
-
-
+    QJsonArray loadJson(QString path);
+    QVector3D unitVectorFromPx(int x, int y, int w, int h);
 };
 #endif // MESH_H

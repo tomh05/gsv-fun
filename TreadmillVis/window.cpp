@@ -2,28 +2,25 @@
 #include "window.h"
 
 
-Window::Window(QWidget *parent) :
+Window::Window(GLWidget * _glWidget, QWidget *parent) :
     QWidget(parent)
 {
-    int startFrame = 700;
-    int endFrame = 849;
-    //Widget *native = new Widget(&helper, this);
+
+    //setWindowTitle(tr("Street View Explorer"));
+
+    glWidget = _glWidget;
+
+    glWidget->show();
+
+
+
+
+
+    /*
     mesh = new Mesh(this);
-
-    mesh->readDepthFiles();
+    mesh->readFiles("/home/tomh/Projects/treadmill/gsv-fun/pan1");
     mesh->buildMesh();
-
-
-    openGL = new GLWidget(mesh,this);
-    QGridLayout *layout = new QGridLayout;
-    layout->addWidget(openGL, 0, 0);
-    setLayout(layout);
-
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), openGL, SLOT(animate()));
-    timer->start(50);
-
-    setWindowTitle(tr("Visualisation"));
+    */
 
 
 

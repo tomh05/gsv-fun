@@ -8,8 +8,8 @@ class GLWidget : public QGLWidget
 {
     Q_OBJECT
 public:
-    GLWidget(Mesh* _mesh, QWidget *parent = 0);
-    
+    GLWidget(QList<Mesh *> *_meshes, QWidget *parent = 0);
+
     void initializeGL();
     void paintGL();
     void renderScene();
@@ -22,8 +22,23 @@ public slots:
 
 private:
     //int elapsed;
-    Mesh * mesh;
+    QList<Mesh*> * meshes;
     qreal theta;
+
+
+    // shaders
+    CGcontext context;
+    CGprogram vertexProgram;
+    CGprogram fragmentProgram;
+    CGparameter modelViewMatrix;
+    CGparameter originParam;
+    CGparameter bearingParam;
+    void initFragmentShader(QString fileName);
+
+    qreal isSecond;
+
+
+
 };
 
 #endif

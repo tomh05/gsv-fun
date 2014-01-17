@@ -83,6 +83,7 @@ for s,step in enumerate(interpSteps):
         routeFileLine  = str(s) + "," + pano.PanoId + "," + \
                 str(pano.Lat[0].content) + "," + str(pano.Lon[0].content) + "," + \
                 str(pano.OriginalLat[0].content) + "," + str(pano.OriginalLon[0].content) + "," +\
+                str(pano.ProjectionPanoYawDeg[0].content) + "," + str(pano.ProjectionTiltYawDeg[0].content) + "," +\
                 str(heading) + "\n"
 
         routeFile.write(routeFileLine)

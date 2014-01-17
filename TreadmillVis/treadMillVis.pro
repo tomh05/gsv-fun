@@ -6,8 +6,9 @@ SOURCES += \
     main.cpp \
     window.cpp \
     glwidget.cpp \
-    imgwidget.cpp \
-    mesh.cpp
+    mesh.cpp \
+    route.cpp \
+    controller.cpp
 
 #mac hack
 unix:!macx {
@@ -21,8 +22,9 @@ LIBS += -lglut  \
 HEADERS += \
     window.h \
     glwidget.h \
-    imgwidget.h \
-    mesh.h
+    mesh.h \
+    route.h \
+    controller.h
 
 INCLUDEPATH += ../shared
 

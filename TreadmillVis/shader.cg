@@ -1,5 +1,7 @@
 // Vertex Shader
 uniform float4x4 matModelView;
+
+
 struct VertInput {
     float4 position  : POSITION;
     float4 color: COLOR;
@@ -30,6 +32,10 @@ vertOutput vert(VertInput IN)  {
 // Fragment Shader
 
 
+float3 origin;
+float bearing;
+
+
 struct fragOutput {
     float4 color : COLOR;
 };
@@ -47,14 +53,16 @@ fragOutput frag(pixelIn IN, uniform sampler2D tex0: TEXUNIT0) {
 
     const float pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062;
 
-    float3 v = normalize(IN.texCoord);
+    float3 coord = IN.texCoord - origin;
+
+    float3 v = normalize(coord );
     fragOutput OUT;
     //OUT.color  = color;
     //OUT.color  = tex2D(tex0,float2(0.4,0.4));
 
     // trig to get image from tex
-    float theta =  atan2(IN.texCoord.x,IN.texCoord.z);
-    float xz = length(float2(IN.texCoord.x, IN.texCoord.y));
+    float theta = pi * 0.5 - atan2(coord.x, coord.z) - (pi / 180.0) * bearing;
+    float xz = length(float2(coord.x, coord.y));
 
     //float phi = - atan2(xz,IN.texCoord.y);
     float phi =  asin(v.y) - 0.5*pi;

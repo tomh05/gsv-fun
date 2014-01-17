@@ -1,12 +1,17 @@
 #include <QApplication>
 #include <QDesktopWidget>
-#include "window.h"
+//#include "window.h"
+#include "controller.h"
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
-    Window window;
+    Controller c;
+
+
+    //Window window;
     //window.resize(window.sizeHint());
-    window.show();
+    //window.show();
+    c.run();
     return app.exec();
 }
 
