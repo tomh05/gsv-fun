@@ -22,6 +22,7 @@
 #include <Cg/cg.h>
 #include <Cg/cgGL.h>
 
+#include <meshpolygon.h>
 
 
 // Shaders
@@ -36,11 +37,11 @@
 #endif
 static const double Pi = 3.14159265358979323846264338327950288419717;
 
-class Mesh : public QGLWidget
+class Mesh : public QObject
 {
     Q_OBJECT
 public:
-    explicit Mesh(QWidget *parent = 0);
+    explicit Mesh(QObject *parent = 0);
     int loadFiles();
     int buildMesh();
     int drawMesh();
@@ -52,6 +53,9 @@ public:
     qreal getPanoBearing() { return panoBearing; }
     void setFilePath(QString fp) { filePath = fp; }
     bool loaded() { return isLoaded; }
+    QImage * getPanImg() { return panImg; }
+
+    qreal getCameraHeight() { return distances->at(1); };
 
 signals:
 
@@ -74,7 +78,7 @@ private:
 
     QString filePath;
 
-    QList<QList<QVector3D> >* polygons;
+    QList<MeshPolygon>* polygons;
 
     //QPoint nextFrom(QPoint p, QPoint b);
     //QList<QVector3D>* meshVertices;

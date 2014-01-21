@@ -27,9 +27,11 @@ int Route::loadFromFolder(QString folderPath)
 
                 if (origin.length() == 0) {
                     origin.append(QVector3D(0.0,0.0,0.0));
+                    cumulativeDistance.append(0.0);
                 } else {
                     QVector3D newVec = latLonDiffToXYDiff(latLon.last() - latLon.at(latLon.length()-2), latLon.at(0).x()) ;
                     origin.append( origin.last() + newVec );
+                    cumulativeDistance.append( cumulativeDistance.last() + newVec.length());
                 }
             }
 

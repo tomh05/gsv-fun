@@ -1,6 +1,7 @@
 #QT       += core opengl
 QT += widgets
 QT += opengl
+QT += serialport
 
 SOURCES += \
     main.cpp \
@@ -8,7 +9,9 @@ SOURCES += \
     glwidget.cpp \
     mesh.cpp \
     route.cpp \
-    controller.cpp
+    controller.cpp \
+    meshpolygon.cpp \
+    serialtalker.cpp
 
 #mac hack
 unix:!macx {
@@ -24,7 +27,9 @@ HEADERS += \
     glwidget.h \
     mesh.h \
     route.h \
-    controller.h
+    controller.h \
+    meshpolygon.h \
+    serialtalker.h
 
 INCLUDEPATH += ../shared
 

@@ -2,11 +2,14 @@
 #define CONTROLLER_H
 
 #include <QObject>
+#include <QTimer>
 
-#include <window.h>
+//#include <window.h>
 #include <glwidget.h>
 #include <mesh.h>
 #include <route.h>
+
+class GLWidget;
 
 class Controller : public QObject
 {
@@ -14,14 +17,22 @@ class Controller : public QObject
 public:
     explicit Controller(QObject *parent = 0);
     void run();
+    qreal getDistanceTravelled() { return distanceTravelled; }
+    void setSpeed(qreal s) { speed = s;}
+    qreal getSpeed() { return speed; }
 
 signals:
 
 public slots:
+    void distanceTimer();
 
 private:
     GLWidget * glWidget;
     QList<Mesh*> * meshes;
+    Route * route;
+    qreal distanceTravelled;
+    qreal speed;
+    int lastWaypoint;
 
 };
 

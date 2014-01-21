@@ -3,12 +3,17 @@
 
 #include <QtOpenGL/QGLWidget>
 #include "mesh.h"
+#include "controller.h"
+
+class Controller;
 
 class GLWidget : public QGLWidget
 {
     Q_OBJECT
 public:
-    GLWidget(QList<Mesh *> *_meshes, QWidget *parent = 0);
+    GLWidget(Controller* _controller, QList<Mesh *> *_meshes, QWidget *parent = 0);
+    void setCamera(QVector3D position, QVector3D lookAt);
+    void setWaypoint(int l) { lastWaypoint = l; }
 
     void initializeGL();
     void paintGL();
@@ -20,10 +25,15 @@ public slots:
     void animate();
     //void paintEvent(QPaintEvent *event);
 
+    void keyPressEvent(QKeyEvent *event);
 private:
     //int elapsed;
     QList<Mesh*> * meshes;
     qreal theta;
+
+    Controller * controller;
+    QVector3D camPos, camAt;
+    int lastWaypoint;
 
 
     // shaders
@@ -35,7 +45,10 @@ private:
     CGparameter bearingParam;
     void initFragmentShader(QString fileName);
 
-    qreal isSecond;
+    GLuint sphereRenderList;
+
+    qreal cameraYOffset;
+    int   meshOffset;
 
 
 

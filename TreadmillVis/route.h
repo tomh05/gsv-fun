@@ -24,6 +24,7 @@ public:
     qreal getHeading(int i) { return heading.at(i); }
     qreal getPanoBearing(int i) { return panoBearing.at(i); }
     int getNumPoints() { return num.length(); }
+    qreal getCumulativeDistance(int i) { return cumulativeDistance.at(i); }
 
     int loadFromFolder(QString folderPath);
 
@@ -39,6 +40,7 @@ private:
     QList<qreal> panoBearing;
     QList<QString> filePath;
     QList<qreal> heading;
+    QList<qreal> cumulativeDistance;
 
     QVector3D latLonDiffToXYDiff(QVector2D latLonDiff, qreal lat0);
 
