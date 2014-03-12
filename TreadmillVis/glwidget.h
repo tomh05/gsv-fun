@@ -36,6 +36,7 @@ private:
     int lastWaypoint;
 
 
+
     // shaders
     CGcontext context;
     CGprogram vertexProgram;
@@ -49,7 +50,6 @@ private:
 
     qreal cameraYOffset;
     int   meshOffset;
-
 
 
 };
